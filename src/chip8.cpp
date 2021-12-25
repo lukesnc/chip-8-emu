@@ -82,13 +82,94 @@ void Chip8::emulate_cycle()
     // Decode opcode
     switch (opcode & 0xF000)
     {
-    case 0x2000:
+    case 0x00E0: // CLS
+        for (int i = 0; i < 2048; i++)
+            gfx[i] = 0;
+        pc += 2;
+        break;
+
+    case 0x00EE: // RET
+        pc = stack[sp];
+        sp--;
+        pc += 2;
+        break;
+
+    case 0x1000: // JP addr
+        pc = opcode & 0x0FFF;
+        break;
+
+    case 0x2000: // CALL addr
         stack[sp] = pc;
         sp++;
         pc = opcode & 0x0FFF;
         break;
+
+    case 0x3000: // Skip if Vx == kk
+        if (V[(opcode & 0x0F00) >> 8] == (opcode & 0x00FF))
+            pc += 2;
+        pc += 2;
+        break;
+
+    case 0x4000: // Skip if Vx != kk
+        if (V[(opcode & 0x0F00) >> 8] != (opcode & 0x00FF))
+            pc += 2;
+        pc += 2;
+        break;
+
+    case 0x5000: // Skip if Vx == Vy
+        if (V[(opcode & 0x0F00) >> 8] == V[(opcode & 0x00F0) >> 4])
+            pc += 2;
+        pc += 2;
+        break;
+
+    case 6000: // Set Vx = kk
+        V[(opcode & 0x0F00) >> 8] = opcode & 0x00FF;
+        pc += 2;
+        break;
+
+    case 7000: // ADD Vx += kk
+        V[(opcode & 0x0F00) >> 8] += opcode & 0x00FF;
+        pc += 2;
+        break;
+
+    case 8000: // 8xy_
+        switch (opcode & 0x000F)
+        {
+        case 0x0000: // Vx = Vy
+            V[(opcode & 0x0F00) >> 8] = V[(opcode & 0x00F0) >> 4];
+            pc += 2;
+            break;
+
+        case 0x0001: // Vx = Vx OR Vy
+            V[(opcode & 0x0F00) >> 8] |= V[(opcode & 0x00F0) >> 4];
+            pc += 2;
+            break;
+
+        case 0x0002:
+            break;
+
+        case 0x0003:
+            break;
+
+        case 0x0004:
+            break;
+
+        case 0x0005:
+            break;
+
+        case 0x0006:
+            break;
+
+        case 0x0007:
+            break;
+
+        case 0x000E:
+            break;
+        }
+        break;
+
     default:
-        std::cout << "Unknown opcode: 0x" << opcode << std::endl;
+        std::cout << "Unimplemented opcode: 0x" << opcode << std::endl;
         exit(1);
     }
 
