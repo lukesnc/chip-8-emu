@@ -145,27 +145,71 @@ void Chip8::emulate_cycle()
             pc += 2;
             break;
 
-        case 0x0002:
+        case 0x0002: // Vx = Vx AND Vy
+            V[(opcode & 0x0F00) >> 8] &= V[(opcode & 0x00F0) >> 4];
+            pc += 2;
             break;
 
-        case 0x0003:
+        case 0x0003: // Vx = Vx XOR Vy
+            V[(opcode & 0x0F00) >> 8] ^= V[(opcode & 0x00F0) >> 4];
+            pc += 2;
             break;
 
-        case 0x0004:
+        case 0x0004: // Vx = Vx + Vy, set VF = carry
+            int sum = V[(opcode & 0x0F00) >> 8] + V[(opcode & 0x00F0) >> 4];
+            V[0xF] = (sum > 0xFF) ? 1 : 0;
+            V[(opcode & 0x0F00) >> 8] = (unsigned char)sum;
+            pc += 2;
             break;
 
-        case 0x0005:
+        case 0x0005: // Set Vx = Vx - Vy, set VF = NOT borrow
+            if (V[(opcode & 0x0F00) >> 8] > V[(opcode & 0x00F0) >> 4])
+                V[0xF] = 1;
+            else
+                V[0xF] = 0;
+            V[(opcode & 0x0F00) >> 8] -= V[(opcode & 0x00F0) >> 4];
+            pc += 2;
             break;
 
-        case 0x0006:
+        case 0x0006: // Set Vx = Vx SHR 1
+            V[0xF] = V[(opcode & 0x0F00) >> 8] & 1;
+            V[(opcode & 0x0F00) >> 8] >>= 1; // same as /= 2
+            pc += 2;
             break;
 
-        case 0x0007:
+        case 0x0007: // Set Vx = Vy - Vx, set VF = NOT borrow
+            if (V[(opcode & 0x00F0) >> 4] > (V[(opcode & 0x0F00) >> 8]))
+                V[0xF] = 1;
+            else
+                V[0xF] = 0;
+            V[(opcode & 0x0F00) >> 8] = V[(opcode & 0x00F0) >> 4] - V[(opcode & 0x0F00) >> 8];
+            pc += 2;
             break;
 
-        case 0x000E:
+        case 0x000E: // Vx = Vx SHL 1
+            V[0xF] = V[(opcode & 0x0F00) >> 8] >> 7;
+            V[(opcode & 0x0F00) >> 8] <<= 1;
+            pc += 2;
             break;
         }
+        break;
+
+    case 0x9000: // Skip next instruction if Vx != Vy
+        if (V[(opcode & 0x0F00) >> 8] != V[(opcode & 0x00F0) >> 4])
+            pc += 2;
+        pc += 2;
+        break;
+
+    case 0xA000: // Set I = nnn
+        I = opcode & 0x0FFF;
+        pc += 2;
+        break;
+
+    case 0xB000: // Jump to location nnn + V0
+        pc = (opcode & 0x0FFF) + V[0];
+        break;
+
+    case 0xC000: // Set Vx = random byte AND kk
         break;
 
     default:
