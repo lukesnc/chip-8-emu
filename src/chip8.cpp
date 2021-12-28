@@ -1,5 +1,7 @@
 #include <fstream>
 #include <iostream>
+#include <stdlib.h>
+#include <time.h>
 
 #include "chip8.h"
 
@@ -33,6 +35,8 @@ void Chip8::init()
     // Reset timers
     sound_timer = 0;
     delay_timer = 0;
+
+    srand(time(NULL)); // Seed random
 }
 
 bool Chip8::load(const char *file_path)
@@ -155,12 +159,14 @@ void Chip8::emulate_cycle()
             pc += 2;
             break;
 
-        case 0x0004: // Vx = Vx + Vy, set VF = carry
+        case 0x0004:
+        { // Vx = Vx + Vy, set VF = carry
             int sum = V[(opcode & 0x0F00) >> 8] + V[(opcode & 0x00F0) >> 4];
             V[0xF] = (sum > 0xFF) ? 1 : 0;
             V[(opcode & 0x0F00) >> 8] = (unsigned char)sum;
             pc += 2;
-            break;
+        }
+        break;
 
         case 0x0005: // Set Vx = Vx - Vy, set VF = NOT borrow
             if (V[(opcode & 0x0F00) >> 8] > V[(opcode & 0x00F0) >> 4])
@@ -210,6 +216,11 @@ void Chip8::emulate_cycle()
         break;
 
     case 0xC000: // Set Vx = random byte AND kk
+        V[(opcode & 0x0F00) >> 8] = (rand() % 256) & (opcode & 0x00FF);
+        pc += 2;
+        break;
+
+    case 0xD000:
         break;
 
     default:
