@@ -1,7 +1,6 @@
 #pragma once
 
-class Chip8
-{
+class Chip8 {
 private:
     unsigned short opcode;      // Current op code
     unsigned char memory[4096]; // 4k memory
@@ -41,5 +40,5 @@ public:
 
     void init();
     void emulate_cycle();             // One emulation cycle
-    bool load(const char *file_path); // Load rom
+    bool load(const char* file_path); // Load rom
 };

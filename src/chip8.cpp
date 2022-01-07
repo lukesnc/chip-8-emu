@@ -17,8 +17,7 @@ void Chip8::init()
         gfx[i] = 0;
 
     // Clear stack, keypad, V registers
-    for (int i = 0; i < 16; i++)
-    {
+    for (int i = 0; i < 16; i++) {
         stack[i] = 0;
         V[i] = 0;
         key[i] = 0;
@@ -39,7 +38,7 @@ void Chip8::init()
     srand(time(NULL)); // Seed random
 }
 
-bool Chip8::load(const char *file_path)
+bool Chip8::load(const char* file_path)
 {
     using namespace std;
 
@@ -47,24 +46,21 @@ bool Chip8::load(const char *file_path)
 
     // Load ROM
     ifstream file(file_path, ios::binary | ios::ate);
-    if (!file.is_open())
-    {
+    if (!file.is_open()) {
         cerr << "error: Unable to load ROM" << endl;
         return false;
     }
 
     // Get file size
     streampos size = file.tellg();
-    if (size > (4096 - 0x200))
-    {
+    if (size > (4096 - 0x200)) {
         cerr << "error: ROM file is too large" << endl;
         return false;
     }
 
     // Write to memory
-    char *buffer;
-    for (int i = 0; i < size; i++)
-    {
+    char* buffer;
+    for (int i = 0; i < size; i++) {
         buffer = new char[1];
         file.seekg(i, ios::beg);
         file.read(buffer, 1);
@@ -84,8 +80,7 @@ void Chip8::emulate_cycle()
     opcode = memory[pc] << 8 | memory[pc + 1];
 
     // Decode opcode
-    switch (opcode & 0xF000)
-    {
+    switch (opcode & 0xF000) {
     case 0x00E0: // CLS
         for (int i = 0; i < 2048; i++)
             gfx[i] = 0;
@@ -137,8 +132,7 @@ void Chip8::emulate_cycle()
         break;
 
     case 8000: // 8xy_
-        switch (opcode & 0x000F)
-        {
+        switch (opcode & 0x000F) {
         case 0x0000: // Vx = Vy
             V[(opcode & 0x0F00) >> 8] = V[(opcode & 0x00F0) >> 4];
             pc += 2;
@@ -159,14 +153,14 @@ void Chip8::emulate_cycle()
             pc += 2;
             break;
 
-        case 0x0004:
-        { // Vx = Vx + Vy, set VF = carry
-            int sum = V[(opcode & 0x0F00) >> 8] + V[(opcode & 0x00F0) >> 4];
-            V[0xF] = (sum > 0xFF) ? 1 : 0;
-            V[(opcode & 0x0F00) >> 8] = (unsigned char)sum;
+        case 0x0004: // Vx = Vx + Vy, set VF = carry
+            if (V[(opcode & 0x00F0) >> 4] > (0xFF - V[(opcode & 0x0F00) >> 8]))
+                V[0xF] = 1;
+            else
+                V[0xF] = 0;
+            V[(opcode & 0x0F00) >> 8] += V[(opcode & 0x00F0) >> 4];
             pc += 2;
-        }
-        break;
+            break;
 
         case 0x0005: // Set Vx = Vx - Vy, set VF = NOT borrow
             if (V[(opcode & 0x0F00) >> 8] > V[(opcode & 0x00F0) >> 4])
@@ -232,8 +226,7 @@ void Chip8::emulate_cycle()
     if (delay_timer > 0)
         delay_timer--;
 
-    if (sound_timer > 0)
-    {
+    if (sound_timer > 0) {
         if (sound_timer == 1)
             std::cout << "BEEP!" << std::endl;
         sound_timer--;
