@@ -18,7 +18,7 @@ Run
 ./chip8 [ROM]
 ```
 
-### Resources
+## Resources
 - https://chip-8.github.io/links/
 - https://en.wikipedia.org/wiki/CHIP-8
 - https://multigesture.net/articles/how-to-write-an-emulator-chip-8-interpreter/
