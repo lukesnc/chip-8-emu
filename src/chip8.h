@@ -37,6 +37,7 @@ private:
 public:
     unsigned char gfx[64 * 32]; // Display
     unsigned char key[16];      // Keypad
+    bool draw_flag;             // Update the screen?
 
     void init();
     void emulate_cycle();             // One emulation cycle
