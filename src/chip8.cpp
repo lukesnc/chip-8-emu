@@ -214,7 +214,47 @@ void Chip8::emulate_cycle()
         pc += 2;
         break;
 
-    case 0xD000:
+    case 0xD000: { // Draw n at (Vx, Vy)
+
+    } break;
+
+    case 0xE000: // Ex__
+        switch (opcode & 0x00FF) {
+        case 0x009E: // SKP if keypad[Vx] is pressed
+            if (key[V[(opcode & 0x0F00) >> 8]] != 0)
+                pc += 2;
+            pc += 2;
+            break;
+        case 0x00A1: // SKP if keypad[Vx] is not pressed
+            if (key[V[(opcode & 0x0F00) >> 8]] == 0)
+                pc += 2;
+            pc += 2;
+            break;
+        }
+        break;
+
+    case 0xF000: // Fx__
+        switch (opcode & 0x00FF) {
+        case 0x0007: // Set Vx = delay timer
+            V[(opcode & 0x0F00) >> 8] = delay_timer;
+            pc += 2;
+            break;
+        case 0x000A: // Wait for key press, store key in Vx
+            for (int i = 0; i < 16; i++) {
+                if (key[i] != 0) {
+                    V[(opcode & 0x0F00) >> 8] = key[i];
+                    pc += 2;
+                    break;
+                }
+            }
+            break;
+        case 0x0033: // LD B, Vx
+            memory[I] = V[(opcode & 0x0F00) >> 8] / 100;
+            memory[I + 1] = (V[(opcode & 0x0F00) >> 8] / 10) % 10;
+            memory[I + 2] = (V[(opcode & 0x0F00) >> 8] % 100) % 10;
+            pc += 2;
+            break;
+        }
         break;
 
     default:
