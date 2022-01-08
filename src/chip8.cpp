@@ -86,6 +86,7 @@ void Chip8::emulate_cycle()
         case 0x00E0: // CLS
             for (int i = 0; i < 2048; i++)
                 gfx[i] = 0;
+            draw_flag = true;
             pc += 2;
             break;
 
