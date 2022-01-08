@@ -215,7 +215,25 @@ void Chip8::emulate_cycle()
         break;
 
     case 0xD000: { // Draw n at (Vx, Vy)
+        unsigned short x = V[(opcode & 0x0F00) >> 8];
+        unsigned short y = V[(opcode & 0x00F0) >> 4];
+        unsigned short height = opcode & 0x000F;
+        unsigned short pixel;
 
+        V[0xF] = 0;
+        for (int yline = 0; yline < height; yline++) {
+            pixel = memory[I + yline];
+            for (int xline = 0; xline < 8; xline++) {
+                if ((pixel & (0x80 >> xline)) != 0) {
+                    if (gfx[(x + xline + ((y + yline) * 64))] == 1)
+                        V[0xF] = 1;
+                    gfx[x + xline + ((y + yline) * 64)] ^= 1;
+                }
+            }
+        }
+
+        draw_flag = true;
+        pc += 2;
     } break;
 
     case 0xE000: // Ex__
@@ -248,10 +266,41 @@ void Chip8::emulate_cycle()
                 }
             }
             break;
+        case 0x0015: // Set delay timer = Vx
+            delay_timer = V[(opcode & 0x0F00) >> 8];
+            pc += 2;
+            break;
+        case 0x0018: // Set sound timer = Vx
+            sound_timer = V[(opcode & 0x0F00) >> 8];
+            pc += 2;
+            break;
+        case 0x001E: // ADD I, Vx
+            I += V[(opcode & 0x0F00) >> 8];
+            pc += 2;
+            break;
+        case 0x0029: // Set I = location of sprite for digit Vx.
+            for (int i = 0; i < 16; i++) {
+                if (fontset[i] == V[(opcode & 0x0F00) >> 8])
+                    I = i;
+            }
+            pc += 2;
+            break;
         case 0x0033: // LD B, Vx
             memory[I] = V[(opcode & 0x0F00) >> 8] / 100;
             memory[I + 1] = (V[(opcode & 0x0F00) >> 8] / 10) % 10;
             memory[I + 2] = (V[(opcode & 0x0F00) >> 8] % 100) % 10;
+            pc += 2;
+            break;
+        case 0x0055: // Store registers V0 through Vx in memory starting at location I.
+            for (int i = 0; i <= ((opcode & 0x0F00) >> 8); i++) {
+                memory[I + i] = V[i];
+            }
+            pc += 2;
+            break;
+        case 0x0065: // Read registers V0 through Vx from memory starting at location I.
+            for (int i = 0; i <= ((opcode & 0x0F00) >> 8); i++) {
+                V[i] = memory[I + i];
+            }
             pc += 2;
             break;
         }
