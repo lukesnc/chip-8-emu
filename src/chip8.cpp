@@ -81,16 +81,20 @@ void Chip8::emulate_cycle()
 
     // Decode opcode
     switch (opcode & 0xF000) {
-    case 0x00E0: // CLS
-        for (int i = 0; i < 2048; i++)
-            gfx[i] = 0;
-        pc += 2;
-        break;
+    case 0x0000:
+        switch (opcode & 0x00FF) {
+        case 0x00E0: // CLS
+            for (int i = 0; i < 2048; i++)
+                gfx[i] = 0;
+            pc += 2;
+            break;
 
-    case 0x00EE: // RET
-        pc = stack[sp];
-        sp--;
-        pc += 2;
+        case 0x00EE: // RET
+            pc = stack[sp];
+            sp--;
+            pc += 2;
+            break;
+        }
         break;
 
     case 0x1000: // JP addr
