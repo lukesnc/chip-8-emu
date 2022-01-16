@@ -28,8 +28,6 @@ void Chip8::init()
 {
     pc = 0x200; // Start program counter at 0x200
     opcode = 0; // Reset op code
-    x = 0;      // Reset x
-    y = 0;      // Reset y
     I = 0;      // Reset I
     sp = 0;     // Reset stack pointer
 

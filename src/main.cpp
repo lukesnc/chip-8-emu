@@ -5,7 +5,7 @@
 
 #include "chip8.h"
 
-#define CYCLE 16 // 60hz
+#define CYCLE 16666 // 60hz
 #define WIDTH 1024
 #define HEIGHT 512
 
@@ -69,7 +69,7 @@ int main(int argc, char** argv)
 
             SDL_UpdateTexture(texture, NULL, frame_buffer, 64 * sizeof(unsigned int));
 
-            // Draw
+            // Render
             SDL_RenderClear(renderer); // Clear screen
             SDL_RenderCopy(renderer, texture, NULL, NULL);
             SDL_RenderPresent(renderer);
