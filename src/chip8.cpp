@@ -111,8 +111,8 @@ void Chip8::exec()
             pc += 2;
             break;
         case 0x000E: // RET
-            pc = stack[sp];
             sp--;
+            pc = stack[sp];
             pc += 2;
             break;
         default:
@@ -178,11 +178,11 @@ void Chip8::exec()
             pc += 2;
             break;
         case 0x0004: // Vx = Vx + Vy, set VF = carry
+            V[x] += V[y];
             if (V[y] > (0xFF - V[x]))
                 V[0xF] = 1;
             else
                 V[0xF] = 0;
-            V[x] += V[y];
             pc += 2;
             break;
         case 0x0005: // Set Vx = Vx - Vy, set VF = NOT borrow

@@ -2,9 +2,9 @@
 
 class Chip8 {
 private:
-    unsigned short opcode;      // Current op code
-    unsigned short x; // x register
-    unsigned short y; // y register
+    unsigned short opcode; // Current op code
+    unsigned short x;      // x register
+    unsigned short y;      // y register
 
     unsigned char memory[4096]; // 4k memory
     unsigned char V[16];        // CPU registers
