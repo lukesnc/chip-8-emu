@@ -1,12 +1,11 @@
-#include <chrono>
 #include <iostream>
-#include <thread>
+#include <unistd.h>
 
 #include <SDL2/SDL.h>
 
 #include "chip8.h"
 
-#define CYCLE (1000 / 60) // 60 Hz in ms
+#define CYCLE 16666
 #define SCREEN_WIDTH 1024
 #define SCREEN_HEIGHT 512
 
@@ -39,9 +38,9 @@ int main(int argc, char** argv)
 
     // Emulation cycle
     for (;;) {
-        myChip8.emulate_cycle();
+        myChip8.exec();
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(CYCLE));
+        usleep(CYCLE);
     }
 
     return 0;

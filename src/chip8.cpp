@@ -5,10 +5,31 @@
 
 #include "chip8.h"
 
+unsigned char fontset[80] = {
+    0xF0, 0x90, 0x90, 0x90, 0xF0, //0
+    0x20, 0x60, 0x20, 0x20, 0x70, //1
+    0xF0, 0x10, 0xF0, 0x80, 0xF0, //2
+    0xF0, 0x10, 0xF0, 0x10, 0xF0, //3
+    0x90, 0x90, 0xF0, 0x10, 0x10, //4
+    0xF0, 0x80, 0xF0, 0x10, 0xF0, //5
+    0xF0, 0x80, 0xF0, 0x90, 0xF0, //6
+    0xF0, 0x10, 0x20, 0x40, 0x40, //7
+    0xF0, 0x90, 0xF0, 0x90, 0xF0, //8
+    0xF0, 0x90, 0xF0, 0x10, 0xF0, //9
+    0xF0, 0x90, 0xF0, 0x90, 0x90, //A
+    0xE0, 0x90, 0xE0, 0x90, 0xE0, //B
+    0xF0, 0x80, 0x80, 0x80, 0xF0, //C
+    0xE0, 0x90, 0x90, 0x90, 0xE0, //D
+    0xF0, 0x80, 0xF0, 0x80, 0xF0, //E
+    0xF0, 0x80, 0xF0, 0x80, 0x80  //F
+};
+
 void Chip8::init()
 {
     pc = 0x200; // Start program counter at 0x200
     opcode = 0; // Reset op code
+    x = 0;      // Reset x
+    y = 0;      // Reset y
     I = 0;      // Reset I
     sp = 0;     // Reset stack pointer
 
@@ -74,10 +95,12 @@ bool Chip8::load(const char* file_path)
     return true;
 }
 
-void Chip8::emulate_cycle()
+void Chip8::exec()
 {
     // Get opcode
     opcode = memory[pc] << 8 | memory[pc + 1];
+    x = (opcode & 0x0F00) >> 8; // x register
+    y = (opcode & 0x00F0) >> 4; // y register
 
     // Decode opcode
     switch (opcode & 0xF000) {
@@ -89,7 +112,6 @@ void Chip8::emulate_cycle()
             draw_flag = true;
             pc += 2;
             break;
-
         case 0x00EE: // RET
             pc = stack[sp];
             sp--;
@@ -109,98 +131,90 @@ void Chip8::emulate_cycle()
         break;
 
     case 0x3000: // Skip if Vx == kk
-        if (V[(opcode & 0x0F00) >> 8] == (opcode & 0x00FF))
+        if (V[x] == (opcode & 0x00FF))
             pc += 2;
         pc += 2;
         break;
 
     case 0x4000: // Skip if Vx != kk
-        if (V[(opcode & 0x0F00) >> 8] != (opcode & 0x00FF))
+        if (V[x] != (opcode & 0x00FF))
             pc += 2;
         pc += 2;
         break;
 
     case 0x5000: // Skip if Vx == Vy
-        if (V[(opcode & 0x0F00) >> 8] == V[(opcode & 0x00F0) >> 4])
+        if (V[x] == V[y])
             pc += 2;
         pc += 2;
         break;
 
     case 6000: // Set Vx = kk
-        V[(opcode & 0x0F00) >> 8] = opcode & 0x00FF;
+        V[x] = opcode & 0x00FF;
         pc += 2;
         break;
 
     case 7000: // ADD Vx += kk
-        V[(opcode & 0x0F00) >> 8] += opcode & 0x00FF;
+        V[x] += opcode & 0x00FF;
         pc += 2;
         break;
 
     case 8000: // 8xy_
         switch (opcode & 0x000F) {
         case 0x0000: // Vx = Vy
-            V[(opcode & 0x0F00) >> 8] = V[(opcode & 0x00F0) >> 4];
+            V[x] = V[y];
             pc += 2;
             break;
-
         case 0x0001: // Vx = Vx OR Vy
-            V[(opcode & 0x0F00) >> 8] |= V[(opcode & 0x00F0) >> 4];
+            V[x] |= V[y];
             pc += 2;
             break;
-
         case 0x0002: // Vx = Vx AND Vy
-            V[(opcode & 0x0F00) >> 8] &= V[(opcode & 0x00F0) >> 4];
+            V[x] &= V[y];
             pc += 2;
             break;
-
         case 0x0003: // Vx = Vx XOR Vy
-            V[(opcode & 0x0F00) >> 8] ^= V[(opcode & 0x00F0) >> 4];
+            V[x] ^= V[y];
             pc += 2;
             break;
-
         case 0x0004: // Vx = Vx + Vy, set VF = carry
-            if (V[(opcode & 0x00F0) >> 4] > (0xFF - V[(opcode & 0x0F00) >> 8]))
+            if (V[y] > (0xFF - V[x]))
                 V[0xF] = 1;
             else
                 V[0xF] = 0;
-            V[(opcode & 0x0F00) >> 8] += V[(opcode & 0x00F0) >> 4];
+            V[x] += V[y];
             pc += 2;
             break;
-
         case 0x0005: // Set Vx = Vx - Vy, set VF = NOT borrow
-            if (V[(opcode & 0x0F00) >> 8] > V[(opcode & 0x00F0) >> 4])
+            if (V[x] > V[y])
                 V[0xF] = 1;
             else
                 V[0xF] = 0;
-            V[(opcode & 0x0F00) >> 8] -= V[(opcode & 0x00F0) >> 4];
+            V[x] -= V[y];
             pc += 2;
             break;
-
         case 0x0006: // Set Vx = Vx SHR 1
-            V[0xF] = V[(opcode & 0x0F00) >> 8] & 1;
-            V[(opcode & 0x0F00) >> 8] >>= 1; // same as /= 2
+            V[0xF] = V[x] & 1;
+            V[x] >>= 1; // same as /= 2
             pc += 2;
             break;
-
         case 0x0007: // Set Vx = Vy - Vx, set VF = NOT borrow
-            if (V[(opcode & 0x00F0) >> 4] > (V[(opcode & 0x0F00) >> 8]))
+            if (V[y] > (V[x]))
                 V[0xF] = 1;
             else
                 V[0xF] = 0;
-            V[(opcode & 0x0F00) >> 8] = V[(opcode & 0x00F0) >> 4] - V[(opcode & 0x0F00) >> 8];
+            V[x] = V[y] - V[x];
             pc += 2;
             break;
-
         case 0x000E: // Vx = Vx SHL 1
-            V[0xF] = V[(opcode & 0x0F00) >> 8] >> 7;
-            V[(opcode & 0x0F00) >> 8] <<= 1;
+            V[0xF] = V[x] >> 7;
+            V[x] <<= 1;
             pc += 2;
             break;
         }
         break;
 
     case 0x9000: // Skip next instruction if Vx != Vy
-        if (V[(opcode & 0x0F00) >> 8] != V[(opcode & 0x00F0) >> 4])
+        if (V[x] != V[y])
             pc += 2;
         pc += 2;
         break;
@@ -215,13 +229,11 @@ void Chip8::emulate_cycle()
         break;
 
     case 0xC000: // Set Vx = random byte AND kk
-        V[(opcode & 0x0F00) >> 8] = (rand() % 256) & (opcode & 0x00FF);
+        V[x] = (rand() % 256) & (opcode & 0x00FF);
         pc += 2;
         break;
 
     case 0xD000: { // Draw n at (Vx, Vy)
-        unsigned short x = V[(opcode & 0x0F00) >> 8];
-        unsigned short y = V[(opcode & 0x00F0) >> 4];
         unsigned short height = opcode & 0x000F;
         unsigned short pixel;
 
@@ -230,9 +242,9 @@ void Chip8::emulate_cycle()
             pixel = memory[I + yline];
             for (int xline = 0; xline < 8; xline++) {
                 if ((pixel & (0x80 >> xline)) != 0) {
-                    if (gfx[(x + xline + ((y + yline) * 64))] == 1)
+                    if (gfx[(V[x] + xline + ((V[y] + yline) * 64))] == 1)
                         V[0xF] = 1;
-                    gfx[x + xline + ((y + yline) * 64)] ^= 1;
+                    gfx[V[x] + xline + ((V[y] + yline) * 64)] ^= 1;
                 }
             }
         }
@@ -244,12 +256,12 @@ void Chip8::emulate_cycle()
     case 0xE000: // Ex__
         switch (opcode & 0x00FF) {
         case 0x009E: // SKP if keypad[Vx] is pressed
-            if (key[V[(opcode & 0x0F00) >> 8]] != 0)
+            if (key[V[x]] != 0)
                 pc += 2;
             pc += 2;
             break;
         case 0x00A1: // SKP if keypad[Vx] is not pressed
-            if (key[V[(opcode & 0x0F00) >> 8]] == 0)
+            if (key[V[x]] == 0)
                 pc += 2;
             pc += 2;
             break;
@@ -259,51 +271,51 @@ void Chip8::emulate_cycle()
     case 0xF000: // Fx__
         switch (opcode & 0x00FF) {
         case 0x0007: // Set Vx = delay timer
-            V[(opcode & 0x0F00) >> 8] = delay_timer;
+            V[x] = delay_timer;
             pc += 2;
             break;
         case 0x000A: // Wait for key press, store key in Vx
             for (int i = 0; i < 16; i++) {
                 if (key[i] != 0) {
-                    V[(opcode & 0x0F00) >> 8] = key[i];
+                    V[x] = key[i];
                     pc += 2;
                     break;
                 }
             }
             break;
         case 0x0015: // Set delay timer = Vx
-            delay_timer = V[(opcode & 0x0F00) >> 8];
+            delay_timer = V[x];
             pc += 2;
             break;
         case 0x0018: // Set sound timer = Vx
-            sound_timer = V[(opcode & 0x0F00) >> 8];
+            sound_timer = V[x];
             pc += 2;
             break;
         case 0x001E: // ADD I, Vx
-            I += V[(opcode & 0x0F00) >> 8];
+            I += V[x];
             pc += 2;
             break;
         case 0x0029: // Set I = location of sprite for digit Vx.
             for (int i = 0; i < 16; i++) {
-                if (fontset[i] == V[(opcode & 0x0F00) >> 8])
+                if (fontset[i] == V[x])
                     I = i;
             }
             pc += 2;
             break;
         case 0x0033: // LD B, Vx
-            memory[I] = V[(opcode & 0x0F00) >> 8] / 100;
-            memory[I + 1] = (V[(opcode & 0x0F00) >> 8] / 10) % 10;
-            memory[I + 2] = (V[(opcode & 0x0F00) >> 8] % 100) % 10;
+            memory[I] = V[x] / 100;
+            memory[I + 1] = (V[x] / 10) % 10;
+            memory[I + 2] = (V[x] % 100) % 10;
             pc += 2;
             break;
         case 0x0055: // Store registers V0 through Vx in memory starting at location I.
-            for (int i = 0; i <= ((opcode & 0x0F00) >> 8); i++) {
+            for (int i = 0; i <= (x); i++) {
                 memory[I + i] = V[i];
             }
             pc += 2;
             break;
         case 0x0065: // Read registers V0 through Vx from memory starting at location I.
-            for (int i = 0; i <= ((opcode & 0x0F00) >> 8); i++) {
+            for (int i = 0; i <= (x); i++) {
                 V[i] = memory[I + i];
             }
             pc += 2;
@@ -312,7 +324,7 @@ void Chip8::emulate_cycle()
         break;
 
     default:
-        std::cout << "Unimplemented opcode: 0x" << opcode << std::endl;
+        std::cerr << "Unimplemented opcode: 0x" << std::hex << opcode << std::endl;
         exit(1);
     }
 
