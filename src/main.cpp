@@ -5,7 +5,7 @@
 
 #include "chip8.h"
 
-#define CYCLE 16666 // 60hz
+#define CYCLE 16666 // 60hz in useconds
 #define WIDTH 1024
 #define HEIGHT 512
 
