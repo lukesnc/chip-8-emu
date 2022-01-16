@@ -16,8 +16,6 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    Chip8 myChip8 = Chip8();
-
     // Create window
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS) != 0) {
         std::cerr << "SDL_Init Error: " << SDL_GetError() << std::endl;
@@ -39,6 +37,9 @@ int main(int argc, char** argv)
     unsigned int frame_buffer[64 * 32];
 
     // Load rom
+    Chip8 myChip8 = Chip8();
+    myChip8.init();
+
     if (!myChip8.load(argv[1]))
         return 1;
 
