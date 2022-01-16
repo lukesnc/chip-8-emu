@@ -105,18 +105,21 @@ void Chip8::exec()
     // Decode opcode
     switch (opcode & 0xF000) {
     case 0x0000:
-        switch (opcode & 0x00FF) {
-        case 0x00E0: // CLS
+        switch (opcode & 0x000F) {
+        case 0x0000: // CLS
             for (int i = 0; i < 2048; i++)
                 gfx[i] = 0;
             draw_flag = true;
             pc += 2;
             break;
-        case 0x00EE: // RET
+        case 0x000E: // RET
             pc = stack[sp];
             sp--;
             pc += 2;
             break;
+        default:
+            std::cerr << "Unimplemented opcode: 0x" << std::hex << opcode << std::endl;
+            exit(1);
         }
         break;
 
@@ -210,6 +213,9 @@ void Chip8::exec()
             V[x] <<= 1;
             pc += 2;
             break;
+        default:
+            std::cerr << "Unimplemented opcode: 0x" << std::hex << opcode << std::endl;
+            exit(1);
         }
         break;
 
@@ -265,6 +271,9 @@ void Chip8::exec()
                 pc += 2;
             pc += 2;
             break;
+        default:
+            std::cerr << "Unimplemented opcode: 0x" << std::hex << opcode << std::endl;
+            exit(1);
         }
         break;
 
@@ -320,6 +329,9 @@ void Chip8::exec()
             }
             pc += 2;
             break;
+        default:
+            std::cerr << "Unimplemented opcode: 0x" << std::hex << opcode << std::endl;
+            exit(1);
         }
         break;
 
