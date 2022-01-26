@@ -9,6 +9,31 @@
 #define WIDTH 1024
 #define HEIGHT 512
 
+/* Keypad
+ * |1|2|3|4|
+ * |q|w|e|r|
+ * |a|s|d|f|
+ * |z|x|c|v|
+ */
+unsigned char keymap[16] = {
+    SDLK_x,
+    SDLK_1,
+    SDLK_2,
+    SDLK_3,
+    SDLK_q,
+    SDLK_w,
+    SDLK_e,
+    SDLK_a,
+    SDLK_s,
+    SDLK_d,
+    SDLK_z,
+    SDLK_c,
+    SDLK_4,
+    SDLK_r,
+    SDLK_f,
+    SDLK_v
+};
+
 int main(int argc, char** argv)
 {
     if (argc != 2) {
@@ -50,13 +75,27 @@ int main(int argc, char** argv)
         // Check keyboard
         SDL_Event e;
         while (SDL_PollEvent(&e)) {
-            if (e.type == SDL_QUIT) {
+            if (e.type == SDL_QUIT || (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_ESCAPE)) {
                 std::cout << "Exiting..." << std::endl;
                 SDL_DestroyTexture(texture);
                 SDL_DestroyRenderer(renderer);
                 SDL_DestroyWindow(window);
                 SDL_Quit();
                 return 0;
+            }
+
+            if (e.type == SDL_KEYDOWN) {
+                for (int i = 0; i < 16; i++) {
+                    if (e.key.keysym.sym == keymap[i])
+                        myChip8.key[i] = 1;
+                }
+            }
+
+            if (e.type == SDL_KEYUP) {
+                for (int i = 0; i < 16; i++) {
+                    if (e.key.keysym.sym == keymap[i])
+                        myChip8.key[i] = 0;
+                }
             }
         }
 
