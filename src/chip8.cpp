@@ -86,10 +86,8 @@ bool Chip8::load(const char* file_path)
         memory[i + 0x200] = *buffer;
     }
 
-    // Cleanup
     file.close();
     delete[] buffer;
-
     return true;
 }
 
