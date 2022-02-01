@@ -3,8 +3,13 @@ A CHIP-8 emulator in C++
 
 ## Build & Run
 Requirements
+Debian/Ubuntu
 ```bash
 sudo apt install cmake libsdl2-dev
+```
+Arch
+```bash
+sudo pacman -S cmake sdl2
 ```
 Compile
 ```bash
