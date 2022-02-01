@@ -3,8 +3,6 @@
 class Chip8 {
 private:
     unsigned short opcode; // Current op code
-    unsigned short x;      // x register
-    unsigned short y;      // y register
 
     unsigned char memory[4096]; // 4k memory
     unsigned char V[16];        // CPU registers
@@ -18,12 +16,13 @@ private:
     unsigned short stack[16]; // CPU stack
     unsigned short sp;        // Stack pointer
 
+    void init();
+
 public:
     unsigned char gfx[64 * 32]; // Display
     unsigned char key[16];      // Keypad
     bool draw_flag;             // Update the screen?
 
-    void init();
     void exec();                      // One emulation cycle
     bool load(const char* file_path); // Load rom
 };

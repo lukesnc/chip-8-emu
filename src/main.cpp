@@ -63,7 +63,6 @@ int main(int argc, char** argv)
 
     // Load rom
     Chip8 myChip8 = Chip8();
-    myChip8.init();
 
     if (!myChip8.load(argv[1]))
         return 1;

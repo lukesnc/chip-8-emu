@@ -59,12 +59,14 @@ void Chip8::init()
 
 bool Chip8::load(const char* file_path)
 {
+    init();
+
     using namespace std;
 
     cout << "Loading file: " << file_path << endl;
 
     // Load ROM
-    ifstream file(file_path, ios::binary | ios::ate);
+    ifstream file(file_path, ios::in | ios::binary | ios::ate);
     if (!file.is_open()) {
         cerr << "error: Unable to load ROM" << endl;
         return false;
@@ -77,16 +79,16 @@ bool Chip8::load(const char* file_path)
         return false;
     }
 
-    // Write to memory
-    char* buffer;
+    // Write to mem
+    char* buffer = new char[size];
+    file.seekg(0, ios::beg);
+    file.read(buffer, size);
+    file.close();
+
     for (int i = 0; i < size; i++) {
-        buffer = new char[1];
-        file.seekg(i, ios::beg);
-        file.read(buffer, 1);
-        memory[i + 0x200] = *buffer;
+        memory[0x200 + i] = (unsigned char)buffer[i];
     }
 
-    file.close();
     delete[] buffer;
     return true;
 }
@@ -95,8 +97,8 @@ void Chip8::exec()
 {
     // Get opcode
     opcode = memory[pc] << 8 | memory[pc + 1];
-    x = (opcode & 0x0F00) >> 8; // x register
-    y = (opcode & 0x00F0) >> 4; // y register
+    unsigned short x = (opcode & 0x0F00) >> 8; // x register
+    unsigned short y = (opcode & 0x00F0) >> 4; // y register
 
     // Decode opcode
     switch (opcode & 0xF000) {
