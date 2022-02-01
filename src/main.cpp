@@ -5,7 +5,7 @@
 
 #include "chip8.h"
 
-#define CYCLE 16666 // 60hz in useconds
+#define CYCLE 1200
 #define WIDTH 1024
 #define HEIGHT 512
 
@@ -75,7 +75,6 @@ int main(int argc, char** argv)
         SDL_Event e;
         while (SDL_PollEvent(&e)) {
             if (e.type == SDL_QUIT || (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_ESCAPE)) {
-                std::cout << "Exiting..." << std::endl;
                 SDL_DestroyTexture(texture);
                 SDL_DestroyRenderer(renderer);
                 SDL_DestroyWindow(window);
