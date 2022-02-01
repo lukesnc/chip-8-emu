@@ -149,17 +149,17 @@ void Chip8::exec()
         pc += 2;
         break;
 
-    case 6000: // Set Vx = kk
+    case 0x6000: // Set Vx = kk
         V[x] = opcode & 0x00FF;
         pc += 2;
         break;
 
-    case 7000: // ADD Vx += kk
+    case 0x7000: // ADD Vx += kk
         V[x] += opcode & 0x00FF;
         pc += 2;
         break;
 
-    case 8000: // 8xy_
+    case 0x8000: // 8xy_
         switch (opcode & 0x000F) {
         case 0x0000: // Vx = Vy
             V[x] = V[y];
