@@ -5,7 +5,7 @@
 
 #include "chip8.h"
 
-unsigned char fontset[80] = {
+unsigned char chip8_fontset[80] = {
     0xF0, 0x90, 0x90, 0x90, 0xF0, //0
     0x20, 0x60, 0x20, 0x20, 0x70, //1
     0xF0, 0x10, 0xF0, 0x80, 0xF0, //2
@@ -48,13 +48,14 @@ void Chip8::init()
 
     // Load fontset
     for (int i = 0; i < 80; i++)
-        memory[i] = fontset[i];
+        memory[i] = chip8_fontset[i];
 
     // Reset timers
     sound_timer = 0;
     delay_timer = 0;
 
-    srand(time(NULL)); // Seed random
+    // Seed random
+    srand(time(NULL));
 }
 
 bool Chip8::load(const char* file_path)
@@ -299,32 +300,32 @@ void Chip8::exec()
             pc += 2;
             break;
         case 0x001E: // ADD I, Vx
+            if (I + V[x] > 0xFFF)
+                V[0xF] = 1;
+            else
+                V[0xF] = 0;
             I += V[x];
             pc += 2;
             break;
         case 0x0029: // Set I = location of sprite for digit Vx.
-            for (int i = 0; i < 16; i++) {
-                if (fontset[i] == V[x])
-                    I = i;
-            }
+            I = V[x] * 0x5;
             pc += 2;
             break;
         case 0x0033: // LD B, Vx
             memory[I] = V[x] / 100;
             memory[I + 1] = (V[x] / 10) % 10;
-            memory[I + 2] = (V[x] % 100) % 10;
+            memory[I + 2] = V[x] % 10;
             pc += 2;
             break;
         case 0x0055: // Store registers V0 through Vx in memory starting at location I.
-            for (int i = 0; i <= (x); i++) {
+            for (int i = 0; i <= (x); i++)
                 memory[I + i] = V[i];
-            }
+            I += x + 1;
             pc += 2;
             break;
         case 0x0065: // Read registers V0 through Vx from memory starting at location I.
-            for (int i = 0; i <= (x); i++) {
+            for (int i = 0; i <= x; i++)
                 V[i] = memory[I + i];
-            }
             pc += 2;
             break;
         default:
