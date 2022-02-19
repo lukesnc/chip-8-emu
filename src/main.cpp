@@ -5,7 +5,7 @@
 
 #include "chip8.h"
 
-#define CYCLE 1200
+#define CYCLE 2000
 #define WIDTH 1024
 #define HEIGHT 512
 
