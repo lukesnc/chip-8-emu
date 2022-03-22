@@ -344,8 +344,7 @@ void Chip8::exec()
 
     if (sound_timer > 0) {
         if (sound_timer == 1)
-            std::cout << "BEEP!"
-                      << "\n";
+            std::cout << "BEEP!\n";
         sound_timer--;
     }
 }
