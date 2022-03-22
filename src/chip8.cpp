@@ -6,22 +6,22 @@
 #include "chip8.h"
 
 unsigned char chip8_fontset[80] = {
-    0xF0, 0x90, 0x90, 0x90, 0xF0, //0
-    0x20, 0x60, 0x20, 0x20, 0x70, //1
-    0xF0, 0x10, 0xF0, 0x80, 0xF0, //2
-    0xF0, 0x10, 0xF0, 0x10, 0xF0, //3
-    0x90, 0x90, 0xF0, 0x10, 0x10, //4
-    0xF0, 0x80, 0xF0, 0x10, 0xF0, //5
-    0xF0, 0x80, 0xF0, 0x90, 0xF0, //6
-    0xF0, 0x10, 0x20, 0x40, 0x40, //7
-    0xF0, 0x90, 0xF0, 0x90, 0xF0, //8
-    0xF0, 0x90, 0xF0, 0x10, 0xF0, //9
-    0xF0, 0x90, 0xF0, 0x90, 0x90, //A
-    0xE0, 0x90, 0xE0, 0x90, 0xE0, //B
-    0xF0, 0x80, 0x80, 0x80, 0xF0, //C
-    0xE0, 0x90, 0x90, 0x90, 0xE0, //D
-    0xF0, 0x80, 0xF0, 0x80, 0xF0, //E
-    0xF0, 0x80, 0xF0, 0x80, 0x80  //F
+    0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
+    0x20, 0x60, 0x20, 0x20, 0x70, // 1
+    0xF0, 0x10, 0xF0, 0x80, 0xF0, // 2
+    0xF0, 0x10, 0xF0, 0x10, 0xF0, // 3
+    0x90, 0x90, 0xF0, 0x10, 0x10, // 4
+    0xF0, 0x80, 0xF0, 0x10, 0xF0, // 5
+    0xF0, 0x80, 0xF0, 0x90, 0xF0, // 6
+    0xF0, 0x10, 0x20, 0x40, 0x40, // 7
+    0xF0, 0x90, 0xF0, 0x90, 0xF0, // 8
+    0xF0, 0x90, 0xF0, 0x10, 0xF0, // 9
+    0xF0, 0x90, 0xF0, 0x90, 0x90, // A
+    0xE0, 0x90, 0xE0, 0x90, 0xE0, // B
+    0xF0, 0x80, 0x80, 0x80, 0xF0, // C
+    0xE0, 0x90, 0x90, 0x90, 0xE0, // D
+    0xF0, 0x80, 0xF0, 0x80, 0xF0, // E
+    0xF0, 0x80, 0xF0, 0x80, 0x80  // F
 };
 
 void Chip8::init()
@@ -60,23 +60,22 @@ void Chip8::init()
 
 bool Chip8::load(const char* file_path)
 {
+    using std::cout, std::cerr, std::ifstream, std::streampos, std::ios;
+
     init();
-
-    using namespace std;
-
-    cout << "Loading file: " << file_path << endl;
+    cout << "Loading file: " << file_path << "\n";
 
     // Load ROM
     ifstream file(file_path, ios::in | ios::binary | ios::ate);
     if (!file.is_open()) {
-        cerr << "error: Unable to load ROM" << endl;
+        cerr << "error: Unable to load ROM\n";
         return false;
     }
 
     // Get file size
     streampos size = file.tellg();
     if (size > (4096 - 0x200)) {
-        cerr << "error: ROM file is too large" << endl;
+        cerr << "error: ROM file is too large\n";
         return false;
     }
 
@@ -117,7 +116,7 @@ void Chip8::exec()
             pc += 2;
             break;
         default:
-            std::cerr << "Unimplemented opcode: 0x" << std::hex << opcode << std::endl;
+            std::cerr << "Unimplemented opcode: 0x" << std::hex << opcode << "\n";
             exit(1);
         }
         break;
@@ -213,7 +212,7 @@ void Chip8::exec()
             pc += 2;
             break;
         default:
-            std::cerr << "Unimplemented opcode: 0x" << std::hex << opcode << std::endl;
+            std::cerr << "Unimplemented opcode: 0x" << std::hex << opcode << "\n";
             exit(1);
         }
         break;
@@ -271,7 +270,7 @@ void Chip8::exec()
             pc += 2;
             break;
         default:
-            std::cerr << "Unimplemented opcode: 0x" << std::hex << opcode << std::endl;
+            std::cerr << "Unimplemented opcode: 0x" << std::hex << opcode << "\n";
             exit(1);
         }
         break;
@@ -329,13 +328,13 @@ void Chip8::exec()
             pc += 2;
             break;
         default:
-            std::cerr << "Unimplemented opcode: 0x" << std::hex << opcode << std::endl;
+            std::cerr << "Unimplemented opcode: 0x" << std::hex << opcode << "\n";
             exit(1);
         }
         break;
 
     default:
-        std::cerr << "Unimplemented opcode: 0x" << std::hex << opcode << std::endl;
+        std::cerr << "Unimplemented opcode: 0x" << std::hex << opcode << "\n";
         exit(1);
     }
 
@@ -345,7 +344,8 @@ void Chip8::exec()
 
     if (sound_timer > 0) {
         if (sound_timer == 1)
-            std::cout << "BEEP!" << std::endl;
+            std::cout << "BEEP!"
+                      << "\n";
         sound_timer--;
     }
 }
