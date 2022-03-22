@@ -6,6 +6,7 @@
 #include "chip8.h"
 
 #define CYCLE 2000
+#define SPEEDUP_MOD 20
 #define WIDTH 1024
 #define HEIGHT 512
 
@@ -63,7 +64,9 @@ int main(int argc, char** argv)
 
     // Load rom
     Chip8 myChip8 = Chip8();
+    bool speedup = false;
 
+load:
     if (!myChip8.load(argv[1]))
         return 1;
 
@@ -80,6 +83,14 @@ int main(int argc, char** argv)
                 SDL_DestroyWindow(window);
                 SDL_Quit();
                 return 0;
+            }
+
+            if (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_SPACE)
+                speedup = !speedup;
+
+            if (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_F1) {
+                std::cout << "Resetting\n";
+                goto load;
             }
 
             if (e.type == SDL_KEYDOWN) {
@@ -113,7 +124,7 @@ int main(int argc, char** argv)
             SDL_RenderPresent(renderer);
         }
 
-        std::this_thread::sleep_for(std::chrono::microseconds(CYCLE));
+        std::this_thread::sleep_for(std::chrono::microseconds(speedup ? (CYCLE / SPEEDUP_MOD) : CYCLE));
     }
 
     return 0;
