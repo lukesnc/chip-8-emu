@@ -37,19 +37,19 @@ unsigned char keymap[16] = {
 int main(int argc, char** argv)
 {
     if (argc != 2) {
-        std::cout << "Usage: ./chip8 [ROM]" << std::endl;
+        std::cout << "Usage: ./chip8 [ROM]\n";
         return 1;
     }
 
     // Create window
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS) != 0) {
-        std::cerr << "SDL_Init Error: " << SDL_GetError() << std::endl;
+        std::cerr << "SDL_Init Error: " << SDL_GetError() << "\n";
         return 1;
     }
 
     SDL_Window* window = SDL_CreateWindow("CHIP-8", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, WIDTH, HEIGHT, SDL_WINDOW_SHOWN);
     if (window == nullptr) {
-        std::cerr << "SDL_CreateWindow Error: " << SDL_GetError() << std::endl;
+        std::cerr << "SDL_CreateWindow Error: " << SDL_GetError() << "\n";
         SDL_Quit();
         return 1;
     }
