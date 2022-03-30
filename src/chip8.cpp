@@ -60,22 +60,22 @@ void Chip8::init()
 
 bool Chip8::load(const char* file_path)
 {
-    using std::cout, std::cerr, std::ifstream, std::streampos, std::ios;
+    using std::ifstream, std::streampos, std::ios;
 
     init();
-    cout << "Loading file: " << file_path << "\n";
+    std::cout << "Loading file: " << file_path << "\n";
 
     // Load ROM
     ifstream file(file_path, ios::in | ios::binary | ios::ate);
     if (!file.is_open()) {
-        cerr << "error: Unable to load ROM\n";
+        std::cerr << "error: Unable to load ROM\n";
         return false;
     }
 
     // Get file size
     streampos size = file.tellg();
     if (size > (4096 - 0x200)) {
-        cerr << "error: ROM file is too large\n";
+        std::cerr << "error: ROM file is too large\n";
         return false;
     }
 
