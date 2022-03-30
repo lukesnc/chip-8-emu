@@ -89,7 +89,7 @@ load:
                 speedup = !speedup;
 
             if (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_F1) {
-                std::cout << "Resetting\n";
+                std::cout << "RESET\n";
                 goto load;
             }
 
