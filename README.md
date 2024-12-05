@@ -1,16 +1,20 @@
 # chip8
 
-A CHIP-8 emulator in C++
+An emulator I made for the CHIP-8 game console in C++.
+
+![Screenshot](./screenshot.png)
 
 ## Requirements
 
-Debian/Ubuntu
+SDL2 will need to be retrieved from your system's package manager.
+
+#### Debian/Ubuntu
 
 ```bash
 sudo apt install cmake libsdl2-dev
 ```
 
-Arch
+#### Arch
 
 ```bash
 sudo pacman -S cmake sdl2
@@ -21,8 +25,7 @@ sudo pacman -S cmake sdl2
 Compile
 
 ```bash
-mkdir build
-cd build
+mkdir build && cd build
 cmake ..
 make
 ```
@@ -33,12 +36,14 @@ Run
 ./chip8 [ROM]
 ```
 
+There are a few games included in the `roms/` folder, there are tons more to be found online.
+
 ## Controls
 
-|Key  |Descrpition             |
+|Key |Descrpition |
 |:---:|:-----------------------|
-|ESC  |Quit the program        |
-|F1   |Reset emulation         |
+|ESC |Quit the program |
+|F1 |Reset emulation |
 |SPACE|Toggle emulation speedup|
 
 ## Resources
